@@ -98,12 +98,14 @@ wss.on('connection', ws => {
     const leave = () => {
         if (roomId !== null) {
             const formerGroupId = roomId
-            groups[formerGroupId] = omit(groups[formerGroupId], userId)
-            roomId = null
             Object.keys(groups[formerGroupId]).forEach(memberId => {
-                groups[formerGroupId][memberId].send(createEvent('user-removed', userId))
+                if(memberId != userId) {
+                    groups[formerGroupId][memberId].send(createEvent('user-removed', userId))
+                }
                 ws.send(createEvent('user-removed', memberId))
             })
+            groups[formerGroupId] = omit(groups[formerGroupId], userId)
+            roomId = null
             ws.send(createEvent('left', formerGroupId))
             if (Object.keys(groups[formerGroupId]).length === 0) {
                 // Remove empty group

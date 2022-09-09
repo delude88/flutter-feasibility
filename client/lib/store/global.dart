@@ -1,25 +1,36 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 
-import 'eventor.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_feasibility/io/repository.dart';
+
 
 class Global with ChangeNotifier {
-  final Eventor _eventSource;
+  final Repository _repository;
+  late StreamSubscription<Event> _listener;
   String? _userId;
   String? _roomId;
 
-  Global(this._eventSource) {
-    _eventSource.on("uid", (userId) {
-      _userId = userId;
-      notifyListeners();
+  Global(this._repository) {
+    _listener = _repository.events.where((event) => event.event == 'uid').listen((event) {
+      if(event.event == 'uid') {
+        _userId = event.payload;
+        return notifyListeners();
+      }
+      if(event.event == 'joined') {
+        _roomId = event.payload;
+        return notifyListeners();
+      }
+      if(event.event == 'left') {
+        _roomId = null;
+        return notifyListeners();
+      }
+      if(event.event == 'close') {
+        _userId = null;
+        _roomId = null;
+        return notifyListeners();
+      }
     });
-    _eventSource.on("joined", (roomId) {
-      _roomId = roomId;
-      notifyListeners();
-    });
-    _eventSource.on("left", () {
-      _roomId = null;
-      notifyListeners();
-    });
+    //TODO: CLOSE stream?!?
   }
 
   bool get loggedIn => _userId?.isNotEmpty ?? false;

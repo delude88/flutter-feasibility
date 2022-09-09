@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feasibility/store/store.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_feasibility/bloc/global_bloc.dart';
+import 'package:flutter_feasibility/io/repository.dart';
 import 'package:flutter_feasibility/ui/components/forms/join_form.dart';
 import 'package:flutter_svg/svg.dart';
 
-class HomeScreen extends StatefulWidget {
-  final Store store;
+class HomeScreen extends StatelessWidget {
+  final Repository repository;
 
-  const HomeScreen({super.key, required this.store});
+  const HomeScreen({super.key, required this.repository});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -21,11 +18,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
     return Scaffold(
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: const Text("Welcome"),
+          title: BlocBuilder<GlobalBloc, GlobalState>(
+              builder: (context, state) => Text("Welcome ${state.userId}")),
         ),
         body: Padding(
           padding: EdgeInsets.all(8),
@@ -39,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: widget.store.eventor.createRoom,
+                        onPressed: repository.createRoom,
                         child: const Text("Create a room"),
                       ),
                     ],
@@ -50,14 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     children: [
                       const Text("or enter an invitation code:"),
-                      JoinForm(eventor: widget.store.eventor),
+                      JoinForm(repository: repository),
                     ],
                   ),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: TextButton(
-                      onPressed: widget.store.eventor.disconnect,
+                      onPressed: repository.disconnect,
                       child: const Text("Logout"),
                     ))
               ],

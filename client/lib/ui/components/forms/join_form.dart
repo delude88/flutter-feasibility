@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feasibility/store/eventor.dart';
+import 'package:flutter_feasibility/io/repository.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 
 typedef LoginCallback = void Function(String email, String password);
 
 class JoinForm extends StatefulWidget {
-  final Eventor eventor;
+  final Repository repository;
 
-  const JoinForm({super.key, required this.eventor});
+  const JoinForm({super.key, required this.repository});
 
   @override
   State<StatefulWidget> createState() => _JoinFormState();
@@ -31,7 +31,7 @@ class _JoinFormState extends State<JoinForm> {
         child: VerificationCode(
           length: 4,
           onCompleted: (String value) {
-            widget.eventor.joinRoom(value);
+            widget.repository.joinRoom(value);
           },
           onEditing: (bool value) {
             setState(() {

@@ -1,92 +1,107 @@
+import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_feasibility/store/eventor.dart';
-import 'package:flutter_feasibility/store/global.dart';
-import 'package:flutter_feasibility/store/store.dart';
+import 'package:flutter_feasibility/bloc/global_bloc.dart';
+import 'package:flutter_feasibility/bloc/members_bloc.dart';
+import 'package:flutter_feasibility/io/repository.dart';
 import 'package:flutter_feasibility/ui/screens/room.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'global_observer.dart';
 import 'ui/screens/home.dart';
 import 'ui/screens/login.dart';
 
+const url = 'ws://localhost:3000';
+
 void main() {
+  Bloc.observer = GlobalObserver();
   runApp(App());
 }
 
 class App extends StatelessWidget {
-  final Store _store = Store(Eventor());
+  final Repository repository = Repository(url);
+  late final GlobalBloc globalBloc;
 
-  App({super.key});
+  App({super.key}) {
+    globalBloc = GlobalBloc(repository);
+  }
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider<Global>.value(
-      value: _store.global,
-      child: MaterialApp.router(
-        routeInformationProvider: _router.routeInformationProvider,
-        routeInformationParser: _router.routeInformationParser,
-        routerDelegate: _router.routerDelegate,
-        title: 'doozoo WebRTC Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-      ));
+  Widget build(BuildContext context) => RepositoryProvider<Repository>.value(
+      value: repository,
+      child: MultiBlocProvider(
+          providers: [
+            BlocProvider<GlobalBloc>.value(value: globalBloc),
+            BlocProvider<MembersBloc>(
+              create: (_) => MembersBloc(repository),
+            ),
+          ],
+          child: MaterialApp.router(
+            routeInformationProvider: _router.routeInformationProvider,
+            routeInformationParser: _router.routeInformationParser,
+            routerDelegate: _router.routerDelegate,
+            title: 'doozoo WebRTC Demo',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+          )));
 
   late final GoRouter _router = GoRouter(
-    routes: <GoRoute>[
-      GoRoute(
-        path: '/',
-        builder: (BuildContext context, GoRouterState state) => HomeScreen(
-          store: _store,
+      routes: <GoRoute>[
+        GoRoute(
+          path: '/',
+          builder: (BuildContext context, GoRouterState state) => HomeScreen(
+            repository: repository,
+          ),
         ),
-      ),
-      GoRoute(
-        path: '/room',
-        builder: (BuildContext context, GoRouterState state) => RoomScreen(
-          store: _store,
+        GoRoute(
+          path: '/room',
+          builder: (BuildContext context, GoRouterState state) =>
+              RoomScreen(repository: repository),
         ),
-      ),
-      GoRoute(
-        path: '/login',
-        builder: (BuildContext context, GoRouterState state) => LoginScreen(
-          eventor: _store.eventor,
+        GoRoute(
+          path: '/login',
+          builder: (BuildContext context, GoRouterState state) => LoginScreen(
+            repository: repository,
+          ),
         ),
-      ),
-    ],
+      ],
 
-    // redirect to the login page if the user is not logged in
-    redirect: (GoRouterState state) {
-      // if the user is not logged in, they need to login
-      final bool loggedIn = _store.global.loggedIn;
-      final bool loggingIn = state.subloc == '/login';
+      // redirect to the login page if the user is not logged in
+      redirect: (GoRouterState state) {
+        // if the user is not logged in, they need to login
+        final bool loggedIn =
+            globalBloc.state.status == ConnectionStatus.connected;
+        final bool loggingIn = state.subloc == '/login';
 
-      if (!loggedIn) {
-        return loggingIn ? null : '/login';
-      }
-
-      // is the user inside a room?
-      if (_store.global.insideRoom) {
-        if (state.subloc != '/room') {
-          return '/room';
+        if (!loggedIn) {
+          return loggingIn ? null : '/login';
         }
-      } else {
-        if (state.subloc == '/room') {
+
+        // is the user inside a room?
+        if (globalBloc.state.roomId.isNotEmpty) {
+          if (state.subloc != '/room') {
+            return '/room';
+          }
+        } else {
+          if (state.subloc == '/room') {
+            return '/';
+          }
+        }
+
+        // if the user is logged in but still on the login page, send them to
+        // the home page
+        if (loggingIn) {
           return '/';
         }
-      }
 
-      // if the user is logged in but still on the login page, send them to
-      // the home page
-      if (loggingIn) {
-        print("Still logged in");
-        return '/';
-      }
+        // no need to redirect at all
+        return null;
+      },
 
-      // no need to redirect at all
-      return null;
-    },
-
-    // changes on the listenable will cause the router to refresh it's route
-    refreshListenable: _store.global,
-  );
+      // changes on the listenable will cause the router to refresh it's route
+      refreshListenable: GoRouterRefreshStream(
+          globalBloc.stream //GoRouterRefreshStream(bloc.stream)
+          ));
 }

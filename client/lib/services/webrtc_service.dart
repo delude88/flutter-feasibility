@@ -1,4 +1,6 @@
-import 'package:flutter_feasibility/store/eventor.dart';
+import 'dart:async';
+
+import 'package:flutter_feasibility/io/repository.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 class Session {
@@ -9,19 +11,27 @@ class Session {
 }
 
 class WebRTCService {
-  final Eventor _eventor;
+  final Repository repository;
+  StreamSubscription<Event>? _listener;
 
-  WebRTCService(this._eventor) {
-    _eventor.on("user-added", (username) {
-      print('WebRTC: member ${username} added');
-    });
-    _eventor.on("user-removed", (username) {
-      print('WebRTC: member ${username} removed');
-    });
+  WebRTCService(this.repository) {
+    /*
+    _listener = repository.events
+        .where((event) => event.event == 'user-added')
+        .listen((event) {
+      if (event.event == 'user-added') {
+        print('WebRTC: member ${event.payload} added');
+        return;
+      }
+      if (event.event == 'user-removed') {
+        print('WebRTC: member ${event.payload} removed');
+        return;
+      }
+    });*/
   }
 
   void close() {
     print("CLEANUP WEBRTC SERVICE");
-    //TODO: Checkout if off methods are really required
+    _listener?.cancel();
   }
 }

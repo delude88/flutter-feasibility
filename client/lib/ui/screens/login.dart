@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feasibility/store/eventor.dart';
+import 'package:flutter_feasibility/io/repository.dart';
 import 'package:flutter_svg/svg.dart';
 import '../components/forms/login_form.dart';
 
 // TODO: TBD: Why Screens and not Views? In Swift views can contain other views, not here. To reduce confusion we might use screens => tbc.
-class LoginScreen extends StatefulWidget {
-  final Eventor eventor;
+class LoginScreen extends StatelessWidget {
+  final Repository repository;
 
-  const LoginScreen({super.key, required this.eventor});
+  const LoginScreen({super.key, required this.repository});
 
-  @override
-  State<StatefulWidget> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         body: Center(
             child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
                     SvgPicture.asset('assets/crown.svg'),
@@ -31,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text("Please sign in using your doozoo Account"),
                     ),
                     LoginForm(
-                      eventor: widget.eventor,
+                        repository: repository
                     ),
                   ],
                 ))));

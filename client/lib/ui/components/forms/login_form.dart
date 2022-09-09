@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feasibility/store/eventor.dart';
+import 'package:flutter_feasibility/io/repository.dart';
 
 typedef LoginCallback = void Function(String email, String password);
 
 class LoginForm extends StatefulWidget {
-  final Eventor eventor;
+  final Repository repository;
 
-  const LoginForm({super.key, required this.eventor});
+  const LoginForm({super.key, required this.repository});
 
   @override
   State<StatefulWidget> createState() => _LoginFormState();
@@ -50,7 +50,7 @@ class _LoginFormState extends State<LoginForm> {
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
             onPressed: () {
-              widget.eventor
+              widget.repository
                   .connect(_emailController.text, _passwordController.text);
             },
             child: const Text('Login'),

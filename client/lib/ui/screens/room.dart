@@ -1,17 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_feasibility/bloc/global_bloc.dart';
+import 'package:flutter_feasibility/io/repository.dart';
 import 'package:flutter_feasibility/services/webrtc_service.dart';
-import 'package:flutter_feasibility/store/global.dart';
-import 'package:flutter_feasibility/store/store.dart';
-import 'package:provider/provider.dart';
+
+import '../components/members.dart';
 
 class RoomScreen extends StatefulWidget {
-  final Store store;
+  final Repository repository;
   final WebRTCService service;
 
-  RoomScreen({super.key, required this.store})
-      : service = WebRTCService(store.eventor);
+  RoomScreen({super.key, required this.repository})
+      : service = WebRTCService(repository);
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -29,23 +31,21 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Global>(
-        builder: (context, global, _) => Scaffold(
+    return BlocBuilder<GlobalBloc, GlobalState>(
+        builder: (context, state) => Scaffold(
               appBar: AppBar(
                 // Here we take the value from the MyHomePage object that was created by
                 // the App.build method, and use it to set our appbar title.
-                title: Text(global.roomId ?? "Loading"),
+                title: Text('Room ${state.roomId}'),
               ),
               body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("Invite people"),
-                  ],
+                  children: const <Widget>[Text("Invite people"), Members()],
                 ),
               ),
               floatingActionButton: FloatingActionButton(
-                onPressed: widget.store.eventor.leaveRoom,
+                onPressed: widget.repository.leaveRoom,
                 tooltip: 'Leave room',
                 backgroundColor: Colors.red,
                 child: const Icon(Icons.logout),

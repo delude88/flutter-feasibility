@@ -1,13 +1,14 @@
-import 'eventor.dart';
+import 'package:flutter_feasibility/io/repository.dart';
+
 import 'global.dart';
 import 'member_list.dart';
 
 class Store {
-  final Eventor eventor;
+  final Repository repository;
   final Global global;
   final MemberList memberList;
 
-  Store(this.eventor)
-      : global = Global(eventor),
-        memberList = MemberList(eventor);
+  Store(this.repository)
+      : global = Global(repository),
+        memberList = MemberList(repository);
 }
