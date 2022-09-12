@@ -1,7 +1,7 @@
 part of 'members_bloc.dart';
 
 class MembersState extends Equatable {
-  final Set<String> members;
+  final Set<Member> members;
 
   const MembersState(this.members);
 

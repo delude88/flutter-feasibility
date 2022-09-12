@@ -5,7 +5,7 @@ abstract class MembersEvent extends Equatable {
 }
 
 class MemberAddedEvent extends MembersEvent {
-  final String member;
+  final Member member;
   const MemberAddedEvent(this.member);
 
   @override
@@ -13,8 +13,17 @@ class MemberAddedEvent extends MembersEvent {
 }
 
 
+class MemberChangedEvent extends MembersEvent {
+  final Member member;
+  const MemberChangedEvent(this.member);
+
+  @override
+  List<Object?> get props => [member];
+}
+
+
 class MemberRemovedEvent extends MembersEvent {
-  final String member;
+  final Member member;
   const MemberRemovedEvent(this.member);
 
   @override

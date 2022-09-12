@@ -4,16 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feasibility/bloc/global_bloc.dart';
 import 'package:flutter_feasibility/io/repository.dart';
-import 'package:flutter_feasibility/services/webrtc_service.dart';
 
 import '../components/members.dart';
 
 class RoomScreen extends StatefulWidget {
   final Repository repository;
-  final WebRTCService service;
 
-  RoomScreen({super.key, required this.repository})
-      : service = WebRTCService(repository);
+  RoomScreen({super.key, required this.repository});
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -25,7 +22,6 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   void dispose() {
-    widget.service.close();
     super.dispose();
   }
 
