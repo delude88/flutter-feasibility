@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 
 part 'global_event.dart';
 
 part 'global_state.dart';
 
 class GlobalBloc extends Bloc<GlobalEvent, GlobalState> {
-  final Repository repository;
+  final SocketConnection repository;
   late StreamSubscription<ConnectionStatus> _connectionStatusListener;
   late StreamSubscription<Event> _eventListener;
 
@@ -48,7 +48,7 @@ class GlobalBloc extends Bloc<GlobalEvent, GlobalState> {
   Future<void> close() {
     _connectionStatusListener.cancel();
     _eventListener.cancel();
-    repository.dispose();
+    repository.disconnect();
     return super.close();
   }
 }

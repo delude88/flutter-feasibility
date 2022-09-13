@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feasibility/bloc/global_bloc.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 import 'package:flutter_feasibility/ui/components/forms/join_form.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomeScreen extends StatelessWidget {
-  final Repository repository;
+  final SocketConnection repository;
 
   const HomeScreen({super.key, required this.repository});
 

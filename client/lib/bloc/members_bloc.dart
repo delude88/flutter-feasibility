@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 import 'package:flutter_feasibility/model/member.dart';
 import 'package:flutter_feasibility/services/webrtc_service.dart';
 
@@ -11,7 +11,7 @@ part 'members_event.dart';
 part 'members_state.dart';
 
 class MembersBloc extends Bloc<MembersEvent, MembersState> {
-  final Repository repository;
+  final SocketConnection repository;
   WebRTCService? _mediaService;
 
   MembersBloc(this.repository) : super(MembersInitial()) {
@@ -47,7 +47,7 @@ class MembersBloc extends Bloc<MembersEvent, MembersState> {
       if (event.event == "user-added") {
         final id = event.payload as String;
         _mediaService?.addPeer(id);
-        return add(MemberAddedEvent(Member(id, id)));
+        return add(MemberAddedEvent(Member(id, id, const [], const [])));
       }
       if (event.event == "user-removed") {
         final id = event.payload as String;

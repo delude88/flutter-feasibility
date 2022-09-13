@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 import 'package:flutter_svg/svg.dart';
 import '../components/forms/login_form.dart';
 
 // TODO: TBD: Why Screens and not Views? In Swift views can contain other views, not here. To reduce confusion we might use screens => tbc.
 class LoginScreen extends StatelessWidget {
-  final Repository repository;
+  final SocketConnection repository;
 
   const LoginScreen({super.key, required this.repository});
 

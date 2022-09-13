@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feasibility/bloc/global_bloc.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 
 import '../components/members.dart';
 
 class RoomScreen extends StatefulWidget {
-  final Repository repository;
+  final SocketConnection repository;
 
   RoomScreen({super.key, required this.repository});
 

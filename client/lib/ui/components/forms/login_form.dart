@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 
 typedef LoginCallback = void Function(String email, String password);
 
 class LoginForm extends StatefulWidget {
-  final Repository repository;
+  final SocketConnection repository;
 
   const LoginForm({super.key, required this.repository});
 

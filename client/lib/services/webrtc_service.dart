@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 class WebRTCConnection {
@@ -65,7 +64,7 @@ abstract class WebRTCService {
 }
 
 class WebRTCServiceImpl implements WebRTCService {
-  final Repository _repository;
+  final SocketConnection _repository;
   @override
   final String peerId;
   @override

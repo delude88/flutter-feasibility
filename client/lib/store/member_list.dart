@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 
 class MemberList with ChangeNotifier {
-  final Repository _repository;
+  final SocketConnection _repository;
   late StreamSubscription<Event> _listener;
   final Set<String> _set = HashSet<String>();
 

@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 
 
 class Global with ChangeNotifier {
-  final Repository _repository;
+  final SocketConnection _repository;
   late StreamSubscription<Event> _listener;
   String? _userId;
   String? _roomId;

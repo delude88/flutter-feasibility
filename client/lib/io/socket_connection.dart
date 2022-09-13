@@ -13,36 +13,60 @@ class Event {
   Event(this.event, [this.payload]);
 }
 
-class Repository {
+abstract class SocketConnection {
+  Stream<Event> get events;
+
+  Stream<ConnectionStatus> get status;
+
+  Future<void> connect(String email, String password);
+
+  Future<void> disconnect();
+
+  void send(String event, [dynamic payload]);
+
+  void createRoom();
+
+  void joinRoom(String id);
+
+  void leaveRoom();
+
+  void dispose();
+}
+
+class SocketConnectionImpl implements SocketConnection {
   final String _url;
   WebSocketChannel? _channel;
   final _streamController = StreamController<Event>.broadcast();
-  final _statusStreamController = StreamController<ConnectionStatus>.broadcast();
+  final _statusStreamController =
+      StreamController<ConnectionStatus>.broadcast();
 
-  Repository(this._url);
+  SocketConnectionImpl(this._url);
 
+  @override
   Stream<Event> get events async* {
     yield* _streamController.stream;
   }
 
+  @override
   Stream<ConnectionStatus> get status async* {
     yield ConnectionStatus.disconnected;
     yield* _statusStreamController.stream;
   }
 
-  bool get connected => _channel?.closeCode == null;
-
+  @override
   void send(String event, [dynamic payload]) {
     print('[SEND EVENT] $event $payload');
     _channel?.sink
         .add(jsonEncode(payload != null ? [event, payload] : [event]));
   }
 
-  disconnect() async {
+  @override
+  Future<void> disconnect() async {
     return await _channel?.sink.close(goingAway);
   }
 
-  connect(String email, String password) async {
+  @override
+  Future<void> connect(String email, String password) async {
     await disconnect();
 
     _statusStreamController.add(ConnectionStatus.connecting);
@@ -73,18 +97,22 @@ class Repository {
     });
   }
 
+  @override
   void createRoom() {
-     send('create');
+    send('create');
   }
 
+  @override
   void joinRoom(String groupId) {
-     send('join', groupId);
+    send('join', groupId);
   }
 
+  @override
   void leaveRoom() {
-     send('leave');
+    send('leave');
   }
 
+  @override
   void dispose() {
     disconnect();
     _statusStreamController.close();

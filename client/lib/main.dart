@@ -2,68 +2,73 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feasibility/bloc/global_bloc.dart';
 import 'package:flutter_feasibility/bloc/members_bloc.dart';
-import 'package:flutter_feasibility/io/repository.dart';
+import 'package:flutter_feasibility/bloc/webrtc_service.dart';
+import 'package:flutter_feasibility/io/socket_connection.dart';
 import 'package:flutter_feasibility/ui/screens/room.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'global_observer.dart';
+import 'example.dart';
 import 'ui/screens/home.dart';
 import 'ui/screens/login.dart';
 
 const url = 'ws://localhost:3000';
 
 void main() {
-  Bloc.observer = GlobalObserver();
+  Bloc.observer = MemberObserver();
+
+  runExample();
+
   runApp(App());
 }
 
 class App extends StatelessWidget {
-  final Repository repository = Repository(url);
+  final SocketConnection socketConnection = SocketConnectionImpl(url);
   late final GlobalBloc globalBloc;
 
   App({super.key}) {
-    globalBloc = GlobalBloc(repository);
+    globalBloc = GlobalBloc(socketConnection);
   }
 
   @override
-  Widget build(BuildContext context) => RepositoryProvider<Repository>.value(
-      value: repository,
-      child: MultiBlocProvider(
-          providers: [
-            BlocProvider<GlobalBloc>.value(value: globalBloc),
-            BlocProvider<MembersBloc>(
-              create: (_) => MembersBloc(repository),
-            ),
-          ],
-          child: MaterialApp.router(
-            routeInformationProvider: _router.routeInformationProvider,
-            routeInformationParser: _router.routeInformationParser,
-            routerDelegate: _router.routerDelegate,
-            title: 'doozoo WebRTC Demo',
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-          )));
+  Widget build(BuildContext context) =>
+      RepositoryProvider<SocketConnection>.value(
+          value: socketConnection,
+          child: MultiBlocProvider(
+              providers: [
+                BlocProvider<GlobalBloc>.value(value: globalBloc),
+                BlocProvider<MembersBloc>(
+                  create: (_) => MembersBloc(socketConnection),
+                ),
+              ],
+              child: MaterialApp.router(
+                routeInformationProvider: _router.routeInformationProvider,
+                routeInformationParser: _router.routeInformationParser,
+                routerDelegate: _router.routerDelegate,
+                title: 'doozoo WebRTC Demo',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  primarySwatch: Colors.blue,
+                ),
+              )));
 
   late final GoRouter _router = GoRouter(
       routes: <GoRoute>[
         GoRoute(
           path: '/',
           builder: (BuildContext context, GoRouterState state) => HomeScreen(
-            repository: repository,
+            repository: socketConnection,
           ),
         ),
         GoRoute(
           path: '/room',
           builder: (BuildContext context, GoRouterState state) =>
-              RoomScreen(repository: repository),
+              RoomScreen(repository: socketConnection),
         ),
         GoRoute(
           path: '/login',
           builder: (BuildContext context, GoRouterState state) => LoginScreen(
-            repository: repository,
+            repository: socketConnection,
           ),
         ),
       ],
